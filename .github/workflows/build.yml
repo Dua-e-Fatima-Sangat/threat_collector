@@ -1,0 +1,32 @@
+name: Build Threat Collector
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+
+jobs:
+  build_collector:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12.8
+
+      - name: Install Dependencies
+        run: pip install -r collector/src/requirements.txt
+
+      - name: Build with PyInstaller (using .spec file)
+        run: pyinstaller collector/src/threat_collector.spec
+
+      - name: Upload Built Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: threat-collector
+          path: dist/
